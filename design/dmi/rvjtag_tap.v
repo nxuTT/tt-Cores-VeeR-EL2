@@ -156,7 +156,7 @@ end
 assign devid_sel  = ir == 5'b00001;
 assign dr_en[0]   = ir == 5'b10000;
 assign dr_en[1]   = ir == 5'b10001;
-assign rst_vec_sel = ir == 5'h18;
+assign rst_vec_sel = ir == 5'b11000;
 
 ///////////////////////////////////////////////////////
 //                      Shift register
