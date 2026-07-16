@@ -50,6 +50,7 @@ module dmi_test_wrapper
   logic [31:0] dmi_wdata;
   logic [31:0] dmi_rdata;
   logic        core_enable;
+  logic [31:1] rst_vec;
 
   assign core_enable = '1;
 

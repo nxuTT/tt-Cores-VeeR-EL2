@@ -25,12 +25,14 @@ module el2_veer_wrapper
 import el2_pkg::*;
  #(
 `include "el2_param.vh"
+   , parameter [31:0] RESET_VEC = `RV_RESET_VEC
 )
 (
    input logic                             clk,
    input logic                             rst_l,
    input logic                             dbg_rst_l,
-   // rst_vec is supposed to be tied to constant in the top level
+   // Kept for interface compatibility. The reset vector is sourced from the
+   // JTAG reset vector TDR instead.
    /*pragma coverage off*/
    input logic [31:1]                      rst_vec,
    /*pragma coverage on*/
@@ -875,6 +877,7 @@ import el2_pkg::*;
    logic                   dmi_reg_wr_en;
    logic [31:0]            dmi_reg_wdata;
    logic [31:0]            dmi_reg_rdata;
+   logic [31:1]            dmi_rst_vec;
 
 `ifdef RV_LOCKSTEP_REGFILE_ENABLE
    el2_regfile_if regfile ();
@@ -883,6 +886,7 @@ import el2_pkg::*;
    // Instantiate the el2_veer core
    el2_veer #(.pt(pt)) veer (
                                 .clk(clk),
+                                .rst_vec(dmi_rst_vec),
 `ifdef RV_LOCKSTEP_REGFILE_ENABLE
                                 .regfile(regfile.veer_rf_src),
 `endif
@@ -896,6 +900,7 @@ import el2_pkg::*;
 
    el2_veer_lockstep #(.pt(pt)) lockstep (
                                 .clk(clk),
+                                .rst_vec(dmi_rst_vec),
 `ifdef RV_LOCKSTEP_REGFILE_ENABLE
                                 .main_core_regfile(regfile.veer_rf_sink),
 `endif // `ifdef RV_LOCKSTEP_REGFILE_ENABLE
@@ -915,7 +920,9 @@ import el2_pkg::*;
 
    logic unused_dmi_hard_reset;
    //  JTAG/DMI instance
-   dmi_wrapper  dmi_wrapper (
+   dmi_wrapper #(
+    .RESET_VEC   (RESET_VEC)
+   ) dmi_wrapper (
     // JTAG signals
     .trst_n      (jtag_trst_n),     // JTAG reset
     .tck         (jtag_tck),        // JTAG clock
@@ -932,6 +939,7 @@ import el2_pkg::*;
     .reg_wr_addr (dmi_addr),        // Write address to Processor
     .reg_en      (dmi_en),          // Write interface bit to Processor
     .reg_wr_en   (dmi_wr_en),       // Write enable to Processor
+    .rst_vec     (dmi_rst_vec),
     .dmi_hard_reset   (unused_dmi_hard_reset)
    );
 
