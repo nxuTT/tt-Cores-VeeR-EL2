@@ -31,11 +31,6 @@ import el2_pkg::*;
    input logic                             clk,
    input logic                             rst_l,
    input logic                             dbg_rst_l,
-   // Kept for interface compatibility. The reset vector is sourced from the
-   // JTAG reset vector TDR instead.
-   /*pragma coverage off*/
-   input logic [31:1]                      rst_vec,
-   /*pragma coverage on*/
    input logic                             nmi_int,
    // jtag_id and nmi_vec are supposed to be tied to constants in the top level
    /*pragma coverage off*/
@@ -859,7 +854,7 @@ import el2_pkg::*;
    assign ifu_axi_bvalid = '0;
    assign ifu_axi_bresp[1:0] = '0;
    assign ifu_axi_bid[pt.IFU_BUS_TAG-1:0] = '0;
- 
+
    /*pragma coverage on*/
 
 `endif //  `ifdef RV_BUILD_AHB_LITE
