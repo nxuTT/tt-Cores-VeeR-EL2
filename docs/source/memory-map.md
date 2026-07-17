@@ -1220,10 +1220,11 @@ There are no ordering guarantees between the core and the DMA slave port accessi
 
 ## Reset Signal and Vector
 
-The core provides a 31-bit wide input bus at its periphery for a reset vector.
-The SoC must provide the reset vector on the `rst_vec[31:1]` bus, which could be hardwired or from a register.
+The reset vector is sourced from the `RSTVEC` register in the JTAG Debug Transport Module (see [](debugging.md#reset-vector-register-rstvec)).
+The register resets to the value of the core complex `RESET_VEC` parameter, so the SoC sets the default reset vector at integration time by overriding this parameter (the parameter defaults to the `RV_RESET_VEC` configuration value).
+A debugger may override the reset vector by programming the `RSTVEC` register through JTAG while the core is held in reset.
 The `rst_l` input signal is active-low, asynchronously asserted, and synchronously deasserted (see also [](clocks.md#reset)).
-When the core is reset, it fetches the first instruction to be executed from the address provided on the reset vector bus.
+When the core is reset, it fetches the first instruction to be executed from the address provided by the reset vector.
 Note that the applied reset vector must be pointing to the ICCM, if enabled, or a valid memory address, which is within an enabled instruction access window if the memory protection mechanism (see [](memory-map.md#memory-protection)) is used.
 
 :::{note}

@@ -35,9 +35,6 @@ Signals which are asynchronous to the core complex clock (`clk`) are marked with
 * - rst_l
   - in
   - Core complex reset (excl. Debug Module)
-* - rst_vec[31:1]
-  - in
-  - Core reset vector
 * - dbg_rst_l
   - in
   - Debug Module reset (incl. JTAG synchronizers)
