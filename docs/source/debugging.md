@@ -43,6 +43,10 @@ The core complex clock (`clk`) frequency must be at least twice the JTAG clock (
   - dmi
   - Debug module interface access
   - [](debugging.md#debug-module-interface-access-register-dmi)
+* - 0x18
+  - RSTVEC
+  - Core reset vector
+  - [](debugging.md#reset-vector-register-rstvec)
 * - 0x1F
   - BYPASS
   - JTAG BYPASS
@@ -209,6 +213,38 @@ This register is mapped to the 5-bit JTAG address space.
   - 0
 :::
 
+#### Reset Vector Register (RSTVEC)
+
+The `RSTVEC` register holds the core reset vector.
+Its value drives the core's internal reset vector, from which the core fetches the first instruction after reset (see [](memory-map.md#reset-signal-and-vector)).
+
+The register resets to the value of the `RESET_VEC` parameter of the core complex (see [](memory-map.md#reset-signal-and-vector)) when `jtag_trst_n` is asserted or when the TAP state machine enters the Test-Logic-Reset state.
+A debugger may program a different reset vector by shifting a new value into this register and passing through the Update-DR state.
+The register is written in the JTAG clock domain; the SoC must only change it while the core is held in reset so that the value is stable when the core samples it.
+
+This register is mapped to the 5-bit JTAG address space.
+
+:::{list-table} Reset Vector Register (RSTVEC, at JTAG 0x18)
+:name: tab-rstvec
+:header-rows: 1
+
+* - **Field**
+  - **Bits**
+  - **Description**
+  - **Access**
+  - **Reset**
+* - rstvec
+  - 31:1
+  - Core reset vector (address bits [31:1] of the first instruction fetched after core reset)
+  - R/W
+  - `RESET_VEC[31:1]` parameter value
+* - 0
+  - 0
+  - Reads as 0
+  - R
+  - 0
+:::
+
 #### BYPASS Register (BYPASS)
 
 The BYPASS register is a standard JTAG register.
@@ -216,7 +252,7 @@ It is implemented as a 1-bit register which has no functional effect, except add
 It allows a debugger to not communicate with this TAP (i.e., bypass it).
 
 :::{note}
-All unused addresses in the 5-bit JTAG address space (i.e., all addresses except 0x01 (`IDCODE`), 0x10 (`dtmcs`), and 0x11 (`dmi`)) select the BYPASS register as well.
+All unused addresses in the 5-bit JTAG address space (i.e., all addresses except 0x01 (`IDCODE`), 0x10 (`dtmcs`), 0x11 (`dmi`), and 0x18 (`RSTVEC`)) select the BYPASS register as well.
 :::
 
 This register is mapped to the 5-bit JTAG address space.
